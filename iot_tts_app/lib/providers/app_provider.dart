@@ -1,17 +1,19 @@
 import 'package:flutter/foundation.dart';
 
 import '../config/app_config.dart';
-import '../services/ocr_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../services/easyocr_service.dart';
 import '../services/tts_service.dart';
 
 class AppProvider extends ChangeNotifier {
-  final OcrService _ocrService = OcrService();
   final TtsService _ttsService = TtsService();
 
   bool _isProcessing = false;
   bool _isSpeaking = false;
   bool _isTtsReady = false;
   String _lastText = '';
+  String _easyOcrBaseUrl = 'http://192.168.1.10:8000';
 
   String _language = AppConfig.defaultLanguage;
   double _speechRate = AppConfig.defaultSpeechRate;
@@ -19,12 +21,14 @@ class AppProvider extends ChangeNotifier {
 
   AppProvider() {
     _initializeTts();
+    _loadEasyOcrBaseUrl();
   }
 
   bool get isProcessing => _isProcessing;
   bool get isSpeaking => _isSpeaking;
   bool get isTtsReady => _isTtsReady;
   String get lastText => _lastText;
+  String get easyOcrBaseUrl => _easyOcrBaseUrl;
   String get language => _language;
   double get speechRate => _speechRate;
   double get pitch => _pitch;
@@ -34,10 +38,7 @@ class AppProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final text = await _ocrService.extractText(
-        imagePath,
-        languageCode: _language,
-      );
+      final text = await _extractViaEasyOcr(imagePath);
       _lastText = text;
       return text;
     } finally {
@@ -79,6 +80,24 @@ class AppProvider extends ChangeNotifier {
     await _initializeTts();
   }
 
+  Future<void> updateEasyOcrBaseUrl(String url) async {
+    _easyOcrBaseUrl = url;
+    notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('easyocr_base_url', _easyOcrBaseUrl);
+  }
+
+  Future<void> _loadEasyOcrBaseUrl() async {
+    final prefs = await SharedPreferences.getInstance();
+    _easyOcrBaseUrl = prefs.getString('easyocr_base_url') ?? _easyOcrBaseUrl;
+    notifyListeners();
+  }
+
+  Future<String> _extractViaEasyOcr(String imagePath) async {
+    final service = EasyOcrService(baseUrl: _easyOcrBaseUrl);
+    return service.extractText(imagePath);
+  }
+
   Future<void> _initializeTts() async {
     _isTtsReady = false;
     notifyListeners();
@@ -96,9 +115,4 @@ class AppProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  @override
-  void dispose() {
-    _ocrService.dispose();
-    super.dispose();
-  }
 }
