@@ -63,7 +63,9 @@ class SettingsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           ElevatedButton.icon(
-            onPressed: () => provider.speak('This is a test of the voice.'),
+            onPressed: provider.isTtsReady
+                ? () => provider.speak('This is a test of the voice.')
+                : null,
             icon: const Icon(Icons.record_voice_over),
             label: const Text('Test Voice'),
           ),

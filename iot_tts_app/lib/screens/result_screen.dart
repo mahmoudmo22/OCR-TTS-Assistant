@@ -72,7 +72,7 @@ class _ResultScreenState extends State<ResultScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               ElevatedButton.icon(
-                onPressed: provider.isSpeaking
+                onPressed: provider.isSpeaking || !provider.isTtsReady
                     ? null
                     : () => provider.speak(_controller.text),
                 icon: const Icon(Icons.play_arrow),

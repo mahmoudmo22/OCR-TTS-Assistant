@@ -5,6 +5,7 @@ typedef SpeakingChanged = void Function(bool isSpeaking);
 class TtsService {
   final FlutterTts _flutterTts = FlutterTts();
   SpeakingChanged? _onSpeakingChanged;
+  bool _isReady = false;
 
   Future<void> initialize({
     required String language,
@@ -13,10 +14,6 @@ class TtsService {
     SpeakingChanged? onSpeakingChanged,
   }) async {
     _onSpeakingChanged = onSpeakingChanged;
-
-    await _flutterTts.setLanguage(language);
-    await _flutterTts.setSpeechRate(speechRate);
-    await _flutterTts.setPitch(pitch);
 
     _flutterTts.setStartHandler(() {
       _onSpeakingChanged?.call(true);
@@ -30,9 +27,18 @@ class TtsService {
     _flutterTts.setErrorHandler((_) {
       _onSpeakingChanged?.call(false);
     });
+
+    await _flutterTts.awaitSpeakCompletion(true);
+    await _flutterTts.setLanguage(language);
+    await _flutterTts.setSpeechRate(speechRate);
+    await _flutterTts.setPitch(pitch);
+    _isReady = true;
   }
 
   Future<void> speak(String text) async {
+    if (!_isReady) {
+      return;
+    }
     await _flutterTts.speak(text);
   }
 
@@ -43,4 +49,6 @@ class TtsService {
   Future<void> pause() async {
     await _flutterTts.pause();
   }
+
+  bool get isReady => _isReady;
 }

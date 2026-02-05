@@ -10,6 +10,7 @@ class AppProvider extends ChangeNotifier {
 
   bool _isProcessing = false;
   bool _isSpeaking = false;
+  bool _isTtsReady = false;
   String _lastText = '';
 
   String _language = AppConfig.defaultLanguage;
@@ -17,19 +18,12 @@ class AppProvider extends ChangeNotifier {
   double _pitch = AppConfig.defaultPitch;
 
   AppProvider() {
-    _ttsService.initialize(
-      language: _language,
-      speechRate: _speechRate,
-      pitch: _pitch,
-      onSpeakingChanged: (isSpeaking) {
-        _isSpeaking = isSpeaking;
-        notifyListeners();
-      },
-    );
+    _initializeTts();
   }
 
   bool get isProcessing => _isProcessing;
   bool get isSpeaking => _isSpeaking;
+  bool get isTtsReady => _isTtsReady;
   String get lastText => _lastText;
   String get language => _language;
   double get speechRate => _speechRate;
@@ -50,6 +44,9 @@ class AppProvider extends ChangeNotifier {
   }
 
   Future<void> speak(String text) async {
+    if (!_isTtsReady) {
+      return;
+    }
     if (text.trim().isEmpty) {
       return;
     }
@@ -66,34 +63,23 @@ class AppProvider extends ChangeNotifier {
 
   Future<void> updateLanguage(String language) async {
     _language = language;
-    await _ttsService.initialize(
-      language: _language,
-      speechRate: _speechRate,
-      pitch: _pitch,
-      onSpeakingChanged: (isSpeaking) {
-        _isSpeaking = isSpeaking;
-        notifyListeners();
-      },
-    );
-    notifyListeners();
+    await _initializeTts();
   }
 
   Future<void> updateSpeechRate(double rate) async {
     _speechRate = rate;
-    await _ttsService.initialize(
-      language: _language,
-      speechRate: _speechRate,
-      pitch: _pitch,
-      onSpeakingChanged: (isSpeaking) {
-        _isSpeaking = isSpeaking;
-        notifyListeners();
-      },
-    );
-    notifyListeners();
+    await _initializeTts();
   }
 
   Future<void> updatePitch(double pitch) async {
     _pitch = pitch;
+    await _initializeTts();
+  }
+
+  Future<void> _initializeTts() async {
+    _isTtsReady = false;
+    notifyListeners();
+
     await _ttsService.initialize(
       language: _language,
       speechRate: _speechRate,
@@ -103,6 +89,7 @@ class AppProvider extends ChangeNotifier {
         notifyListeners();
       },
     );
+    _isTtsReady = _ttsService.isReady;
     notifyListeners();
   }
 
