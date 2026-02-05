@@ -1,0 +1,57 @@
+.DS_Store
+.idea/
+.vscode/
+*.iml
+.classpath
+.project
+.settings/
+*.log
+
+# Flutter/Dart
+.dart_tool/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+build/
+**/flutter/ephemeral/
+
+# Android/Gradle
+**/android/.gradle/
+**/android/local.properties
+**/android/**/build/
+**/android/**/captures/
+**/android/**/generated/
+**/android/**/bin/
+**/android/**/obj/
+
+# iOS/Xcode
+**/ios/Flutter/ephemeral/
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/DerivedData/
+**/ios/Flutter/flutter_export_environment.sh
+**/ios/.flutter-plugins-dependencies
+**/ios/.flutter-plugins
+**/ios/Runner/GeneratedPluginRegistrant.*
+**/ios/Runner.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+**/ios/Runner.xcworkspace/xcuserdata/
+**/ios/Runner.xcodeproj/xcuserdata/
+
+# macOS
+**/macos/Flutter/ephemeral/
+**/macos/Pods/
+**/macos/.symlinks/
+**/macos/DerivedData/
+**/macos/Flutter/flutter_export_environment.sh
+**/macos/Runner/GeneratedPluginRegistrant.*
+**/macos/Runner.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+**/macos/Runner.xcworkspace/xcuserdata/
+**/macos/Runner.xcodeproj/xcuserdata/
+
+# Linux/Windows build artifacts
+**/linux/flutter/ephemeral/
+**/linux/build/
+**/windows/flutter/ephemeral/
+**/windows/build/
