@@ -34,7 +34,10 @@ class AppProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final text = await _ocrService.extractText(imagePath);
+      final text = await _ocrService.extractText(
+        imagePath,
+        languageCode: _language,
+      );
       _lastText = text;
       return text;
     } finally {
